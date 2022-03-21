@@ -10,7 +10,7 @@ faceCascade = cv2.CascadeClassifier(cascPath)
 
 # Read the image
 image = cv2.imread(imagePath, cv2.IMREAD_UNCHANGED)
-faceOverlay = cv2.imread('doge.png', -1)
+faceOverlay = cv2.imread('dogeface.png', -1)
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 # Detect faces in the image
