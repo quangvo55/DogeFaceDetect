@@ -35,16 +35,31 @@ while True:
     )
 
     for (x, y, w, h) in faces:
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        x_offset=x
+        y_offset=y
+
+        # resize overlay image to fit face
+        down_width = w
+        down_height = h
+        scale_down_x = down_width/o_width
+        scale_down_y = down_height/o_height
+        scaled_f_down = cv2.resize(faceOverlay, None, fx= scale_down_x, fy= scale_down_y, interpolation= cv2.INTER_LINEAR)
+
+        y1, y2 = y_offset, y_offset + scaled_f_down.shape[0]
+        x1, x2 = x_offset, x_offset + scaled_f_down.shape[1]
+        alpha_s = scaled_f_down[:, :, 2] / 255.0
+        alpha_l = 1.0 - alpha_s
+
+        # overlay small image over face w/ alpha blending
+        for c in range(0, 3):
+            try:
+                frame[y1:y2, x1:x2, c] = (alpha_s * scaled_f_down[:, :, c] + alpha_l * frame[y1:y2, x1:x2, c])
+            except BaseException as err:
+                print(f"Unexpected {err=}, {type(err)=}")
 
     if anterior != len(faces):
         anterior = len(faces)
         log.info("faces: "+str(len(faces))+" at "+str(dt.datetime.now()))
-
-
-    # Display the resulting frame
-    cv2.imshow('Video', frame)
-
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
